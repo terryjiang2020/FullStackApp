@@ -1,6 +1,6 @@
 {
   "name": "fullstackapp",
-  "version": "0.1.0",
+  "version": "1.0.1",
   "private": true,
   "dependencies": {
     "axios": "^0.26.1",
@@ -36,5 +36,6 @@
   },
   "devDependencies": {
     "web-vitals": "^2.1.4"
-  }
+  },
+  "proxy": "https://intense-journey-91807.herokuapp.com"
 }
