@@ -8,7 +8,7 @@ import { CreateReceipes } from './components/CreateReceipes';
 function App() {
   return (
     <div className="App">
-      <h5>FullStackApp using React, PHP and MySQL </h5>
+      <h5>FullStackApp using React, PHP and MySQL</h5>
 
       <BrowserRouter>
         <nav>
