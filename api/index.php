@@ -29,6 +29,7 @@ switch ($method) {
         exit;
     }
     
+    
     $sql = "SELECT * FROM users";
     $path = explode('/', $_SERVER['REQUEST_URI']);
     if (isset($path[3]) && is_numeric($path[3])) {
