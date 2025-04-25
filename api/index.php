@@ -21,6 +21,7 @@ $user = file_get_contents('php://input');
 $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
+  // Handle GET request
   case "GET":
     // Handle special parameter for connectivity check
     if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
