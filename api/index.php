@@ -28,7 +28,6 @@ switch ($method) {
         checkConnectivity();
         exit;
     }
-
     
     $sql = "SELECT * FROM users";
     $path = explode('/', $_SERVER['REQUEST_URI']);
