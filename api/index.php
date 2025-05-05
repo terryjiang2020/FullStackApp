@@ -23,6 +23,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 switch ($method) {
   // Handle GET request
   case "GET":
+    print_r('GET is triggered');
     // Handle special parameter for connectivity check
     if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
         checkConnectivity();
@@ -47,6 +48,7 @@ switch ($method) {
     break;
 
   case "POST":
+    print_r('POST is triggered');
     $user = json_decode(file_get_contents('php://input'));
     $sql = "INSERT INTO users(id, name, email, mobile, created_at, updated_at) VALUES(null, :name, :email, :mobile, :created_at, :updated_at)";
     $stmt = $conn->prepare($sql);
