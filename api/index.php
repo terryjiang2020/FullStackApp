@@ -25,10 +25,10 @@ switch ($method) {
   case "GET":
     print_r('GET is triggered');
     // Handle special parameter for connectivity check
-    if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
-        checkConnectivity();
-        exit;
-    }
+    // if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
+    //     checkConnectivity();
+    //     exit;
+    // }
     
     $sql = "SELECT * FROM users";
     $path = explode('/', $_SERVER['REQUEST_URI']);
@@ -73,35 +73,35 @@ switch ($method) {
  * Function to check both internet and database connectivity
  * This will be called by the cron job
  */
-function checkConnectivity() {
-    // Check internet connectivity (reusing existing functionality)
-    include_once 'check_internet.php';
+// function checkConnectivity() {
+//     // Check internet connectivity (reusing existing functionality)
+//     include_once 'check_internet.php';
     
-    // Check database connectivity
-    try {
-        $dbConnect = new DbConnect;
-        $conn = $dbConnect->connect();
-        $timestamp = date('Y-m-d H:i:s');
-        $dbStatus = "Connected";
-    } catch (Exception $e) {
-        $timestamp = date('Y-m-d H:i:s');
-        $dbStatus = "Disconnected: " . $e->getMessage();
-    }
+//     // Check database connectivity
+//     try {
+//         $dbConnect = new DbConnect;
+//         $conn = $dbConnect->connect();
+//         $timestamp = date('Y-m-d H:i:s');
+//         $dbStatus = "Connected";
+//     } catch (Exception $e) {
+//         $timestamp = date('Y-m-d H:i:s');
+//         $dbStatus = "Disconnected: " . $e->getMessage();
+//     }
     
-    // Log database connectivity
-    $logFile = __DIR__ . '/connectivity_log.txt';
-    $logMessage = "[{$timestamp}] Database connection status: {$dbStatus}\n";
-    file_put_contents($logFile, $logMessage, FILE_APPEND);
+//     // Log database connectivity
+//     $logFile = __DIR__ . '/connectivity_log.txt';
+//     $logMessage = "[{$timestamp}] Database connection status: {$dbStatus}\n";
+//     file_put_contents($logFile, $logMessage, FILE_APPEND);
     
-    // Return statuses as JSON
-    $response = [
-        'timestamp' => $timestamp,
-        'internet' => $isConnected ?? false,
-        'database' => ($dbStatus === "Connected")
-    ];
+//     // Return statuses as JSON
+//     $response = [
+//         'timestamp' => $timestamp,
+//         'internet' => $isConnected ?? false,
+//         'database' => ($dbStatus === "Connected")
+//     ];
     
-    echo json_encode($response);
-}
+//     echo json_encode($response);
+// }
 
 /**
  * Sets up a cron job to check connectivity every hour
