@@ -24,11 +24,11 @@ switch ($method) {
   // Handle GET request
   case "GET":
     print_r('GET is triggered');
-    // Handle special parameter for connectivity check
-    // if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
-    //     checkConnectivity();
-    //     exit;
-    // }
+    Handle special parameter for connectivity check
+    if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
+        checkConnectivity();
+        exit;
+    }
     
     $sql = "SELECT * FROM users";
     $path = explode('/', $_SERVER['REQUEST_URI']);
@@ -73,77 +73,77 @@ switch ($method) {
  * Function to check both internet and database connectivity
  * This will be called by the cron job
  */
-// function checkConnectivity() {
-//     // Check internet connectivity (reusing existing functionality)
-//     include_once 'check_internet.php';
+function checkConnectivity() {
+    // Check internet connectivity (reusing existing functionality)
+    include_once 'check_internet.php';
     
-//     // Check database connectivity
-//     try {
-//         $dbConnect = new DbConnect;
-//         $conn = $dbConnect->connect();
-//         $timestamp = date('Y-m-d H:i:s');
-//         $dbStatus = "Connected";
-//     } catch (Exception $e) {
-//         $timestamp = date('Y-m-d H:i:s');
-//         $dbStatus = "Disconnected: " . $e->getMessage();
-//     }
+    // Check database connectivity
+    try {
+        $dbConnect = new DbConnect;
+        $conn = $dbConnect->connect();
+        $timestamp = date('Y-m-d H:i:s');
+        $dbStatus = "Connected";
+    } catch (Exception $e) {
+        $timestamp = date('Y-m-d H:i:s');
+        $dbStatus = "Disconnected: " . $e->getMessage();
+    }
     
-//     // Log database connectivity
-//     $logFile = __DIR__ . '/connectivity_log.txt';
-//     $logMessage = "[{$timestamp}] Database connection status: {$dbStatus}\n";
-//     file_put_contents($logFile, $logMessage, FILE_APPEND);
+    // Log database connectivity
+    $logFile = __DIR__ . '/connectivity_log.txt';
+    $logMessage = "[{$timestamp}] Database connection status: {$dbStatus}\n";
+    file_put_contents($logFile, $logMessage, FILE_APPEND);
     
-//     // Return statuses as JSON
-//     $response = [
-//         'timestamp' => $timestamp,
-//         'internet' => $isConnected ?? false,
-//         'database' => ($dbStatus === "Connected")
-//     ];
+    // Return statuses as JSON
+    $response = [
+        'timestamp' => $timestamp,
+        'internet' => $isConnected ?? false,
+        'database' => ($dbStatus === "Connected")
+    ];
     
-//     echo json_encode($response);
-// }
+    echo json_encode($response);
+}
 
 /**
  * Sets up a cron job to check connectivity every hour
  */
-// function setupConnectivityCronJob() {
-//     $scriptPath = realpath(__DIR__);
-//     $phpPath = shell_exec('which php');
-//     $phpPath = trim($phpPath);
+function setupConnectivityCronJob() {
+    $scriptPath = realpath(__DIR__);
+    $phpPath = shell_exec('which php');
+    $phpPath = trim($phpPath);
     
-//     // Create a cron entry that will run every hour
-//     $cronCommand = "0 * * * * $phpPath $scriptPath/index.php?check_connectivity=true > /dev/null 2>&1";
+    // Create a cron entry that will run every hour
+    $cronCommand = "0 * * * * $phpPath $scriptPath/index.php?check_connectivity=true > /dev/null 2>&1";
     
-//     // Get current crontab
-//     $output = [];
-//     exec('crontab -l 2>/dev/null', $output);
+    // Get current crontab
+    $output = [];
+    exec('crontab -l 2>/dev/null', $output);
     
-//     // Check if our command is already in crontab
-//     $alreadyExists = false;
-//     foreach ($output as $line) {
-//         if (strpos($line, 'index.php?check_connectivity=true') !== false) {
-//             $alreadyExists = true;
-//             break;
-//         }
-//     }
+    // Check if our command is already in crontab
+    $alreadyExists = false;
+    foreach ($output as $line) {
+        if (strpos($line, 'index.php?check_connectivity=true') !== false) {
+            $alreadyExists = true;
+            break;
+        }
+    }
     
-//     if (!$alreadyExists) {
-//         // Add our command
-//         $output[] = $cronCommand;
+    if (!$alreadyExists) {
+        // Add our command
+        $output[] = $cronCommand;
         
-//         // Write to a temporary file
-//         $tempFile = tempnam(sys_get_temp_dir(), 'cron');
-//         file_put_contents($tempFile, implode(PHP_EOL, $output) . PHP_EOL);
+        // Write to a temporary file
+        $tempFile = tempnam(sys_get_temp_dir(), 'cron');
+        file_put_contents($tempFile, implode(PHP_EOL, $output) . PHP_EOL);
         
-//         // Install new crontab
-//         exec('crontab ' . $tempFile);
-//         unlink($tempFile);
+        // Install new crontab
+        exec('crontab ' . $tempFile);
+        unlink($tempFile);
         
-//         echo "Connectivity check cron job has been setup successfully. Will run every hour.\n";
-//     } else {
-//         echo "Connectivity check cron job already exists.\n";
-//     }
+        echo "Connectivity check cron job has been setup successfully. Will run every hour.\n";
+    } else {
+        echo "Connectivity check cron job already exists.\n";
+    }
     
-//     // Execute a check immediately
-//     checkConnectivity();
-// }
+    // Execute a check immediately
+    checkConnectivity();
+}
