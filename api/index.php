@@ -7,7 +7,7 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 // Check if script is being run on server startup and setup cron job
 $setupCron = isset($_GET['setup_cron']) && $_GET['setup_cron'] === 'true';
 // if ($setupCron || (php_sapi_name() === 'cli' && isset($argv) && in_array('--setup-cron', $argv))) {
-    setupConnectivityCronJob();
+    // setupConnectivityCronJob();
 // }
 
 include 'DBConnect.php';
