@@ -22,30 +22,30 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
   // Handle GET request
-  case "GET":
-    print_r('GET is triggered');
-    Handle special parameter for connectivity check
-    if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
-        checkConnectivity();
-        exit;
-    }
+  // case "GET":
+  //   print_r('GET is triggered');
+  //   Handle special parameter for connectivity check
+  //   if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
+  //       checkConnectivity();
+  //       exit;
+  //   }
     
-    $sql = "SELECT * FROM users";
-    $path = explode('/', $_SERVER['REQUEST_URI']);
-    if (isset($path[3]) && is_numeric($path[3])) {
-      $sql .= " WHERE id = :id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':id', $path[3]);
-      $stmt->execute();
-      $users = $stmt->fetch(PDO::FETCH_ASSOC);
-    } else {
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+  //   $sql = "SELECT * FROM users";
+  //   $path = explode('/', $_SERVER['REQUEST_URI']);
+  //   if (isset($path[3]) && is_numeric($path[3])) {
+  //     $sql .= " WHERE id = :id";
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->bindParam(':id', $path[3]);
+  //     $stmt->execute();
+  //     $users = $stmt->fetch(PDO::FETCH_ASSOC);
+  //   } else {
+  //     $stmt = $conn->prepare($sql);
+  //     $stmt->execute();
+  //     $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  //   }
     
-    echo json_encode($users);
-    break;
+  //   echo json_encode($users);
+  //   break;
 
   case "POST":
     print_r('POST is triggered');
