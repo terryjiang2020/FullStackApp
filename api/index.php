@@ -5,10 +5,10 @@ header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
 //echo "Testing";
 
 // Check if script is being run on server startup and setup cron job
-// $setupCron = isset($_GET['setup_cron']) && $_GET['setup_cron'] === 'true';
-// if ($setupCron || (php_sapi_name() === 'cli' && isset($argv) && in_array('--setup-cron', $argv))) {
-//     setupConnectivityCronJob();
-// }
+$setupCron = isset($_GET['setup_cron']) && $_GET['setup_cron'] === 'true';
+if ($setupCron || (php_sapi_name() === 'cli' && isset($argv) && in_array('--setup-cron', $argv))) {
+    setupConnectivityCronJob();
+}
 
 include 'DBConnect.php';
 $objectDB = new DbConnect;
@@ -22,52 +22,52 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
   // Handle GET request
-  case "GET":
-    print_r('GET is triggered');
-    Handle special parameter for connectivity check
-    if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
-        checkConnectivity();
-        exit;
-    }
+//   case "GET":
+//     print_r('GET is triggered');
+//     Handle special parameter for connectivity check
+//     if (isset($_GET['check_connectivity']) && $_GET['check_connectivity'] === 'true') {
+//         checkConnectivity();
+//         exit;
+//     }
     
-    $sql = "SELECT * FROM users";
-    $path = explode('/', $_SERVER['REQUEST_URI']);
-    if (isset($path[3]) && is_numeric($path[3])) {
-      $sql .= " WHERE id = :id";
-      $stmt = $conn->prepare($sql);
-      $stmt->bindParam(':id', $path[3]);
-      $stmt->execute();
-      $users = $stmt->fetch(PDO::FETCH_ASSOC);
-    } else {
-      $stmt = $conn->prepare($sql);
-      $stmt->execute();
-      $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+//     $sql = "SELECT * FROM users";
+//     $path = explode('/', $_SERVER['REQUEST_URI']);
+//     if (isset($path[3]) && is_numeric($path[3])) {
+//       $sql .= " WHERE id = :id";
+//       $stmt = $conn->prepare($sql);
+//       $stmt->bindParam(':id', $path[3]);
+//       $stmt->execute();
+//       $users = $stmt->fetch(PDO::FETCH_ASSOC);
+//     } else {
+//       $stmt = $conn->prepare($sql);
+//       $stmt->execute();
+//       $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
+//     }
     
-    echo json_encode($users);
-    break;
+//     echo json_encode($users);
+//     break;
 
-  case "POST":
-    print_r('POST is triggered');
-    $user = json_decode(file_get_contents('php://input'));
-    $sql = "INSERT INTO users(id, name, email, mobile, created_at, updated_at) VALUES(null, :name, :email, :mobile, :created_at, :updated_at)";
-    $stmt = $conn->prepare($sql);
-    $created_at = date('Y-m-d');
-    $updated_at = date('Y-m-d');
-    $stmt->bindParam(':name', $user->name);
-    $stmt->bindParam(':email', $user->email);
-    $stmt->bindParam(':mobile', $user->mobile);
-    $stmt->bindParam(':created_at', $created_at);
-    $stmt->bindParam(':updated_at', $updated_at);
+//   case "POST":
+//     print_r('POST is triggered');
+//     $user = json_decode(file_get_contents('php://input'));
+//     $sql = "INSERT INTO users(id, name, email, mobile, created_at, updated_at) VALUES(null, :name, :email, :mobile, :created_at, :updated_at)";
+//     $stmt = $conn->prepare($sql);
+//     $created_at = date('Y-m-d');
+//     $updated_at = date('Y-m-d');
+//     $stmt->bindParam(':name', $user->name);
+//     $stmt->bindParam(':email', $user->email);
+//     $stmt->bindParam(':mobile', $user->mobile);
+//     $stmt->bindParam(':created_at', $created_at);
+//     $stmt->bindParam(':updated_at', $updated_at);
 
-    if ($stmt->execute()) {
-      $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-      $response = ['status' => 0, 'message' => 'Failed to create record.'];
-    }
-    echo json_encode($response);
-    break;
-}
+//     if ($stmt->execute()) {
+//       $response = ['status' => 1, 'message' => 'Record created successfully.'];
+//     } else {
+//       $response = ['status' => 0, 'message' => 'Failed to create record.'];
+//     }
+//     echo json_encode($response);
+//     break;
+// }
 
 /**
  * Function to check both internet and database connectivity
