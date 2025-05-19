@@ -21,6 +21,12 @@ export function ListAllReceipes() {
     });
   }
 
+  function handleDelete(id) {
+    if (window.confirm('Are you sure you want to delete this recipe?')) {
+      setName((prev) => prev.filter((item) => item.id !== id));
+    }
+  }
+
   return (
     <div>
       <h1>List Receipes</h1>
@@ -47,6 +53,9 @@ export function ListAllReceipes() {
                {p.id} | {p.name} | {p.amount}
               </p>
             ))}
+              <td>
+                <button onClick={() => handleDelete(name.id)} style={{color: 'white', background: 'red', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer'}}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
