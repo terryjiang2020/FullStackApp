@@ -50,21 +50,83 @@ switch ($method) {
   case "POST":
     print_r('POST is triggered');
     $user = json_decode(file_get_contents('php://input'));
-    $sql = "INSERT INTO users(id, name, email, mobile, created_at, updated_at) VALUES(null, :name, :email, :mobile, :created_at, :updated_at)";
+    $response = ['status' => 0, 'message' => 'Failed to create record.'];
+    
+    // Input validation
+    if (!isset($user->name) || empty($user->name)) {
+      $response['message'] = 'Name is required.';
+      echo json_encode($response);
+      break;
+    }
+    
+    if (!isset($user->email) || empty($user->email)) {
+      $response['message'] = 'Email is required.';
+      echo json_encode($response);
+      break;
+    }
+    
+    // Validate email format
+    if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+      $response['message'] = 'Invalid email format.';
+      echo json_encode($response);
+      break;
+    }
+    
+    // Check for email uniqueness
+    $checkEmailStmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = :email");
+    $checkEmailStmt->bindParam(':email', $user->email);
+    $checkEmailStmt->execute();
+    
+    if ($checkEmailStmt->fetchColumn() > 0) {
+      $response['message'] = 'Email already exists. Please use a different email address.';
+      echo json_encode($response);
+      break;
+    }
+    
+    // Password validation
+  if (!isset($user->password) || empty($user->password)) {
+    $response['message'] = 'Password is required.';
+    echo json_encode($response);
+    break;
+  }
+  
+  // Password strength validation
+  // Implement multi-level password strength validation
+  // Level 1: Minimum length
+  // Level 2: Character type diversity (uppercase, lowercase, numbers)
+  // Level 3: Special characters
+  $password = $user->password;
+  $passwordStrength = checkPasswordStrength($password);
+  
+  if ($passwordStrength['level'] === 'weak') {
+    $response['message'] = 'Password is too weak: ' . $passwordStrength['message'];
+    echo json_encode($response);
+    break;
+  }
+    
+    // Hash password before storing it
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+    
+    $sql = "INSERT INTO users(id, name, email, password, mobile, created_at, updated_at) 
+            VALUES(null, :name, :email, :password, :mobile, :created_at, :updated_at)";
     $stmt = $conn->prepare($sql);
-    $created_at = date('Y-m-d');
-    $updated_at = date('Y-m-d');
+    $created_at = date('Y-m-d H:i:s');
+    $updated_at = date('Y-m-d H:i:s');
     $stmt->bindParam(':name', $user->name);
     $stmt->bindParam(':email', $user->email);
+    $stmt->bindParam(':password', $hashedPassword);
     $stmt->bindParam(':mobile', $user->mobile);
     $stmt->bindParam(':created_at', $created_at);
     $stmt->bindParam(':updated_at', $updated_at);
 
     if ($stmt->execute()) {
-      $response = ['status' => 1, 'message' => 'Record created successfully.'];
-    } else {
-      $response = ['status' => 0, 'message' => 'Failed to create record.'];
+      $response = [
+        'status' => 1, 
+        'message' => 'User created successfully.',
+        'userId' => $conn->lastInsertId()
+      ];
     }
+    
     echo json_encode($response);
     break;
 }
@@ -146,4 +208,82 @@ function setupConnectivityCronJob() {
     
     // Execute a check immediately
     checkConnectivity();
+}
+
+/**
+ * Function to check password strength with multiple levels of validation
+ * 
+ * Level 1: Basic validation (length)
+ * Level 2: Character type requirements (uppercase, lowercase, numbers)
+ * Level 3: Additional security features (special characters, length >= 10)
+ * 
+ * @param string $password The password to check
+ * @return array Password strength details including level, message and score
+ */
+function checkPasswordStrength($password) {
+  $result = [
+    'level' => 'weak',
+    'message' => '',
+    'score' => 0
+  ];
+  
+  // Level 1: Basic Length check
+  if (strlen($password) < 8) {
+    $result['message'] = 'Password must be at least 8 characters long.';
+    return $result;
+  }
+  
+  $result['score']++;
+  
+  // Level 2: Character type diversity
+  
+  // Check for uppercase letters
+  if (preg_match('/[A-Z]/', $password)) {
+    $result['score']++;
+  } else {
+    $result['message'] = 'Password should contain at least one uppercase letter.';
+    return $result;
+  }
+  
+  // Check for lowercase letters
+  if (preg_match('/[a-z]/', $password)) {
+    $result['score']++;
+  } else {
+    $result['message'] = 'Password should contain at least one lowercase letter.';
+    return $result;
+  }
+  
+  // Check for numbers
+  if (preg_match('/[0-9]/', $password)) {
+    $result['score']++;
+  } else {
+    $result['message'] = 'Password should contain at least one number.';
+    return $result;
+  }
+  
+  // Level 3: Additional security features
+  
+  // Check for special characters
+  if (preg_match('/[^A-Za-z0-9]/', $password)) {
+    $result['score']++;
+  }
+  
+  // Check for longer length (extra points for 10+ characters)
+  if (strlen($password) >= 10) {
+    $result['score']++;
+  }
+  
+  // Determine strength level based on comprehensive score
+  if ($result['score'] < 3) {
+    $result['level'] = 'weak';
+    $result['message'] = 'Password is too weak. Use a mix of uppercase, lowercase, numbers, and special characters.';
+  } else if ($result['score'] < 5) {
+    $result['level'] = 'medium';
+    $result['message'] = 'Password strength is medium. Add special characters and increase length for a stronger password.';
+  } else {
+    $result['level'] = 'strong';
+    $result['message'] = 'Password strength is strong.';
+  }
+  
+  return $result;
 }
